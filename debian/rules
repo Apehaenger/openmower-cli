@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@
+	dh $@ --without autoreconf
 
 # Skip build step - binary is pre-built via Docker/shiv
 override_dh_auto_build:
@@ -9,5 +9,9 @@ override_dh_auto_build:
 
 # Install binary and systemd service
 override_dh_auto_install:
-	install -D -m 0755 openmower $(CURDIR)/debian/openmower-cli/usr/local/bin/openmower
+	install -D -m 0755 $(CURDIR)/artifacts/openmower $(CURDIR)/debian/openmower-cli/usr/local/bin/openmower
 	install -D -m 0644 debian/openmower-cli.service $(CURDIR)/debian/openmower-cli/lib/systemd/system/openmower-cli.service
+
+# Skip dh_usrlocal - we install to /usr/local/bin manually
+override_dh_usrlocal:
+	@echo "Skipping dh_usrlocal"

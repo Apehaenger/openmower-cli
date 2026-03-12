@@ -1,0 +1,7 @@
+openmower-cli (1.0.4) stable; urgency=low
+
+  * Initial release
+  * Includes MQTT RPC service support
+  * Systemd service included
+
+ -- Apehaenger <joerg@ebeling.ws>  Tue, 03 Dec 2026 21:00:00 +0000
