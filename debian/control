@@ -1,0 +1,13 @@
+Source: openmower-cli
+Section: utils
+Priority: optional
+Maintainer: Apehaenger <joerg@ebeling.ws>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/ClemensElflein/openmower-cli
+
+Package: openmower-cli
+Architecture: any
+Depends: python3 (>= 3.10), ${misc:Depends}, ${python3:Depends}
+Description: OpenMower Command Line Interface
+ Command line tool for OpenMower robot control, configuration and MQTT RPC service support.

@@ -59,20 +59,60 @@ jobs:
         with:
           name: openmower-cli
           path: artifacts/
+  build-deb:
+    name: "Build Debian Package"
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: openmower-cli
+          path: artifacts
+      - name: Copy binary to debian directory
+        run: |
+          cp artifacts/openmower debian/
+      - name: Build Debian package
+        run: |
+          # Install build dependencies
+          sudo apt-get update
+          sudo apt-get install -y debhelper-compat
+          # Build the package
+          dpkg-buildpackage -us -uc
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: openmower-cli-deb
+          path: |
+            *.deb
+            *.changes
+            *.dsc
   tagged-release:
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-    needs: build
+    needs: [build, build-deb]
     steps:
       - name: Download artifacts from build stage
         uses: actions/download-artifact@v4
         with:
           name: openmower-cli
           path: artifacts
+      - name: Download Debian package
+        uses: actions/download-artifact@v4
+        with:
+          name: openmower-cli-deb
+          path: deb
       - name: Compress release directory into a versioned ZIP file
         run: cd artifacts && zip -r "../openmower-cli-${{ github.ref_name }}.zip" .
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: "openmower-cli-${{ github.ref_name }}.zip"
+          files: |
+            openmower-cli-${{ github.ref_name }}.zip
+            *.deb
